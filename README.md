@@ -1,3 +1,3 @@
 # React + TypeScript
-a social events
+A social events network
 
