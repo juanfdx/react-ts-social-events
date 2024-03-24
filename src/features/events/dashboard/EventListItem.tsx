@@ -1,8 +1,13 @@
 import { Button, Icon, Item, ItemGroup, List, Segment, SegmentGroup } from "semantic-ui-react";
 import EventListAttendee from "./EventListAttendee";
+import { AppEvent } from "../../../app/types/event";
+
+type Props = {
+  event: AppEvent
+}
 
 
-export default function EventListItem({event}: any) {
+export default function EventListItem({event}: Props) {
 
   return (
     <SegmentGroup>
@@ -39,7 +44,7 @@ export default function EventListItem({event}: any) {
       </Segment>
 
       <Segment clearing>
-        <span>{event.description}</span>
+        <span style={{display: 'block', marginBottom: '30px' }}>{event.description}</span>
         <Button floated='right' color='teal' content='View'></Button>
       </Segment>
 

@@ -1,6 +1,12 @@
 import { Button, Container, Form, Header, Segment } from "semantic-ui-react";
 
-export default function EventForm() {
+type Props = {
+  setIsFormOpen: (value: boolean) => void;
+}
+
+
+export default function EventForm({setIsFormOpen}: Props) {
+  
   return (
     <Segment>
       <Header content='Create Event' />
@@ -26,7 +32,7 @@ export default function EventForm() {
 
         <Container  textAlign='right'>
           <Button type="submit" positive content='Submit' />
-          <Button type="button"  content='Cancel' />
+          <Button type="button"  content='Cancel' onClick={() => setIsFormOpen(false)} />
         </Container>
       </Form>
     </Segment>
