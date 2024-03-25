@@ -1,16 +1,24 @@
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
 import { Container } from "semantic-ui-react"
+//components
 import Navbar from "./nav/Navbar"
+import HomePage from "../../features/Home/HomePage"
 
 
 function App() {
 
+  const location = useLocation()
+
   return (
     <>
-      <Navbar  />
-      <Container className="main">
-        <Outlet />
-      </Container>
+      {location.pathname === '/' ? <HomePage /> : (
+        <>
+          <Navbar  />
+          <Container className="main">
+            <Outlet />
+          </Container>
+        </>
+      )}
     </>
     
   )

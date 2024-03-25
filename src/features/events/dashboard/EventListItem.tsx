@@ -1,6 +1,7 @@
 import { Button, Icon, Item, ItemGroup, List, Segment, SegmentGroup } from "semantic-ui-react";
 import EventListAttendee from "./EventListAttendee";
 import { AppEvent } from "../../../app/types/event";
+import { Link } from "react-router-dom";
 
 type Props = {
   event: AppEvent;
@@ -52,6 +53,8 @@ export default function EventListItem({event}: Props) {
         >
         </Button>
         <Button 
+          as={Link}
+          to={`/events/${event.id}`}
           style={{marginRight: '2px'}}
           floated='right' 
           color='teal' 

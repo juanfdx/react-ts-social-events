@@ -1,14 +1,11 @@
 import { ChangeEvent, FormEvent, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button, Container, Form, Header, Segment } from "semantic-ui-react";
 
 
 
 export default function EventForm() {
- /* 
- *The nullish coalescing (??) operator is a shorthand for the logical operator ||.
- *It returns its right-hand side operand when its left-hand side operand is null or undefined, 
- *otherwise returns its left-hand side operand. 
- */
+
   const initialValues = {
     title: '',
     category: '',
@@ -101,9 +98,17 @@ export default function EventForm() {
 
         <Container  textAlign='right'>
           <Button type="submit" positive content='Submit' />
-          <Button type="button"  content='Cancel' />
+          <Button as={Link} to='/events' type="button"  content='Cancel' />
         </Container>
       </Form>
     </Segment>
   )
 }
+
+
+ /*
+ * NOTE: 
+ *The nullish coalescing (??) operator is a shorthand for the logical operator ||.
+ *It returns its right-hand side operand when its left-hand side operand is null or undefined, 
+ *otherwise returns its left-hand side operand. 
+ */
