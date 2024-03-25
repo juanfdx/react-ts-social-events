@@ -1,23 +1,15 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Button, Container, Form, Header, Segment } from "semantic-ui-react";
-import { AppEvent } from "../../../app/types/event";
-import { createId } from "@paralleldrive/cuid2";
-
-type Props = {
-  setIsFormOpen: (value: boolean) => void;
-  addEvent: (event: AppEvent) => void;
-  selectedEvent: AppEvent | null;
-  updateEvent: (event: AppEvent) => void;
-}
 
 
-export default function EventForm({setIsFormOpen, addEvent, selectedEvent, updateEvent}: Props) {
+
+export default function EventForm() {
  /* 
  *The nullish coalescing (??) operator is a shorthand for the logical operator ||.
  *It returns its right-hand side operand when its left-hand side operand is null or undefined, 
  *otherwise returns its left-hand side operand. 
  */
-  const initialValues =  selectedEvent ?? {
+  const initialValues = {
     title: '',
     category: '',
     description: '',
@@ -31,12 +23,13 @@ export default function EventForm({setIsFormOpen, addEvent, selectedEvent, updat
 
   function onSubmit(e:FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // if selectedEvent then updateEvent if not then addEvent
-      
-    selectedEvent 
-      ? updateEvent({...selectedEvent, ...values}) 
-      : addEvent({...values, id: createId(), hostedBy: 'Marc', hostPhotoURL: '', attendees: []});  
-    setIsFormOpen(false);
+    console.log(values);
+    
+    // if selectedEvent then updateEvent if not then addEvent  
+    // selectedEvent 
+    //   ? updateEvent({...selectedEvent, ...values}) 
+    //   : addEvent({...values, id: createId(), hostedBy: 'Marc', hostPhotoURL: '', attendees: []});  
+    // setIsFormOpen(false);
   }
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {  
@@ -49,7 +42,7 @@ export default function EventForm({setIsFormOpen, addEvent, selectedEvent, updat
   
   return (
     <Segment>
-      <Header content={selectedEvent ? 'Update Event' : 'Create Event'} />
+      <Header content={'Create Event'} />
       <Form onSubmit={onSubmit}>
         <Form.Field>
           <input 
@@ -108,7 +101,7 @@ export default function EventForm({setIsFormOpen, addEvent, selectedEvent, updat
 
         <Container  textAlign='right'>
           <Button type="submit" positive content='Submit' />
-          <Button type="button"  content='Cancel' onClick={() => setIsFormOpen(false)} />
+          <Button type="button"  content='Cancel' />
         </Container>
       </Form>
     </Segment>
