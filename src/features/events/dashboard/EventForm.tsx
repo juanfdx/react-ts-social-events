@@ -1,12 +1,23 @@
 import { ChangeEvent, FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { createId } from "@paralleldrive/cuid2";
+//redux
+import { useAppDispatch, useAppSelector } from "../../../app/store/store";
+//components
 import { Button, Container, Form, Header, Segment } from "semantic-ui-react";
+import { createEvent, updateEvent } from "../eventSlice";
 
 
 
 export default function EventForm() {
 
-  const initialValues = {
+  let {id} = useParams()
+  const event = useAppSelector(state => state.events.events.find(e=> e.id === id));
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
+
+  const initialValues = event ?? {
     title: '',
     category: '',
     description: '',
@@ -20,13 +31,13 @@ export default function EventForm() {
 
   function onSubmit(e:FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(values);
+    id = id ?? createId();// is there another way
     
-    // if selectedEvent then updateEvent if not then addEvent  
-    // selectedEvent 
-    //   ? updateEvent({...selectedEvent, ...values}) 
-    //   : addEvent({...values, id: createId(), hostedBy: 'Marc', hostPhotoURL: '', attendees: []});  
-    // setIsFormOpen(false);
+    event
+      ? dispatch(updateEvent({...event, ...values}))
+      : dispatch(createEvent({...values, id, hostedBy: 'Marc', hostPhotoURL: '', attendees: []}))
+  
+    navigate(`/events/${id}`)
   }
 
   function handleInputChange(e: ChangeEvent<HTMLInputElement>) {  
@@ -39,7 +50,7 @@ export default function EventForm() {
   
   return (
     <Segment>
-      <Header content={'Create Event'} />
+      <Header content={event ? 'Update Event' : 'Create Event'} />
       <Form onSubmit={onSubmit}>
         <Form.Field>
           <input 

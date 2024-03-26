@@ -1,20 +1,14 @@
-import { useEffect, useState } from "react";
 import { Grid } from "semantic-ui-react";
+//redux
+import { useAppSelector } from "../../../app/store/store";
+//components
 import EventList from "./EventList";
-import { AppEvent } from "../../../app/types/event";
-import { sampleData } from "../../../app/api/sampleData";
 
 
 
 export default function EventDashboard() {
 
-  const [events, setEvents] = useState<AppEvent[]>([]);
-
-  useEffect(()=> {
-    setEvents(sampleData);
-  }, [])
-
-
+  const {events} = useAppSelector(state => state.events);
 
   return (
     <Grid>
