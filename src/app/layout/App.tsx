@@ -3,6 +3,7 @@ import { Container } from "semantic-ui-react"
 //components
 import Navbar from "./nav/Navbar"
 import HomePage from "../../features/Home/HomePage"
+import ModalManager from "../common/modals/ModalManager"
 
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
     <>
       {location.pathname === '/' ? <HomePage /> : (
         <>
+          <ModalManager />
           <Navbar  />
           <Container className="main">
             <Outlet />

@@ -9,7 +9,7 @@ import EventList from "./EventList";
 export default function EventDashboard() {
 
   const {events} = useAppSelector(state => state.events);
-
+    
   return (
     <Grid>
 
