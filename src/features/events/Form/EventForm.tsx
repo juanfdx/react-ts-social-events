@@ -1,41 +1,102 @@
+import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Controller, FieldValues, useForm } from "react-hook-form";
-import { createId } from "@paralleldrive/cuid2";
+import { toast } from "react-toastify";
 //redux
-import { useAppDispatch, useAppSelector } from "../../../app/store/store";
-import { createEvent, updateEvent } from "../eventSlice";
+import { useAppSelector } from "../../../app/store/store";
+import { actions } from "../eventSlice";
 //date-picker
 import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
+//fireStore
+import { Timestamp } from "firebase/firestore";
+//hook
+import { useFireStore } from "../../../app/hooks/fireStore/useFireStore";
 //components
 import { Button, Container, Form, Header, Segment } from "semantic-ui-react";
 import { categoryOptions } from "./categoryOptions";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
+//Type
+import { AppEvent } from "../../../app/types/event";
 
 
 
 export default function EventForm() {
+  const {loadDocument, create, update} = useFireStore('events');
   //control prop for <Controller /> component in the form to control <Select /> component
   //setValue for <Select /> component, work with onChange prop
   const {register, handleSubmit, control, setValue, formState: { errors, isValid, isSubmitting }} = useForm({
     mode: 'onTouched',
+    //to tell the form re-render so can show data in its fields when reload page
+    defaultValues: async () => {
+      if (event) return {...event, date: new Date(event.date)}
+    } 
   });
 
-  let {id} = useParams()
-  const event = useAppSelector(state => state.events.events.find(e=> e.id === id));
-  const dispatch = useAppDispatch()
+  const {id} = useParams()
+  const event = useAppSelector(state => state.events.data.find(e=> e.id === id));
+  const {status} = useAppSelector(state => state.events);
   const navigate = useNavigate()
 
+  useEffect(() => {
+    if (!id) return;
+    loadDocument(id, actions);
 
-  function onSubmit(data: FieldValues) {
-    id = id ?? createId();// is there another way?
-    
-    event
-      ? dispatch(updateEvent({...event, ...data, date: data.date.toDateString()}))//toDateString() so obj date can be rendered as string
-      : dispatch(createEvent({...data, id, hostedBy: 'Marc', hostPhotoURL: '', attendees: [], date: data.date.toDateString()}))
+
+  }, [id, loadDocument])
   
-    navigate(`/events/${id}`)
+
+  //update event
+  async function updateEvent(data: AppEvent) {
+    if (!event) return;
+
+    await update(data.id, {
+      ...data,
+       date: Timestamp.fromDate(data.date as unknown as Date),
+    });
+  }
+  
+  //create event
+  async function createEvent(data: AppEvent) { 
+    const ref = await create({
+      ...data,
+       hostedBy: 'Marc', 
+       hostPhotoURL: '', 
+       attendees: [],
+       date: Timestamp.fromDate(data.date as unknown as Date),
+    });
+
+    return ref;
   }
 
+  //cancel event
+  async function handleCancelToggle(event:AppEvent) {
+    await update(event.id, {
+      isCancelled: !event.isCancelled
+    })
+    toast.success(`Event has been ${event.isCancelled ? 'uncancelled' : 'cancelled'}`)
+  }
+
+  //submit event
+  async function onSubmit(data: FieldValues) {
+    try {
+      if (event) { 
+        await updateEvent({ ...event, ...data});
+        navigate(`/events/${event.id}`);
+      }
+      else {
+        const ref = await createEvent(data as AppEvent);
+        navigate(`/events/${ref?.id}`);
+      }
+      
+    } catch (error: any) {
+      toast.error(error.message);
+      console.error(error.message);
+    }
+  }
+
+
+  if (status === 'loading') return <LoadingComponent />
 
   
   return (
@@ -109,8 +170,20 @@ export default function EventForm() {
             )}
           />
         </Form.Field>
-
+        
         <Container  textAlign='right' style={{marginTop: '20px'}}>
+          
+          {event && 
+            <Button 
+              type='button'
+              floated='left'
+              color={event.isCancelled ? 'green' : 'red'} 
+              content={event.isCancelled ? 'Reactivate event' : 'Cancel event'} 
+              onClick={() => handleCancelToggle(event)}
+            />
+
+          }
+
           <Button 
             loading={isSubmitting} 
             disabled={!isValid} 

@@ -1,37 +1,73 @@
-import { createSlice } from "@reduxjs/toolkit"
-import { sampleData } from "../../app/api/sampleData"
+import { PayloadAction } from "@reduxjs/toolkit"
 import { AppEvent } from "../../app/types/event"
+import { Timestamp } from "firebase/firestore/lite"
+import { GenericActions, GenericState, createGenericSlice } from "../../app/store/genericSlice"
 
 
 type State = {
-  events: AppEvent[]
+  data: AppEvent[]
 }
 
 const initialState: State = {
-  events: sampleData
+  data: []
 }
 
 
-export const eventSlice = createSlice({
+export const eventSlice = createGenericSlice({
   name: 'events',
-  initialState,
+  initialState: initialState as GenericState<AppEvent[]>,
   reducers: {
-    createEvent: (state, action) => {
-      const newEvent = action.payload
-      state.events = [...state.events, newEvent]
-    },
-    updateEvent: (state, action) => {
-      state.events = 
-        state.events.map(e => e.id === action.payload.id ? action.payload : e)
-    },
-    deleteEvent: (state, action) => {
-      state.events = state.events.filter(e => e.id !== action.payload)
+    success: {
+      reducer: (state, action: PayloadAction<AppEvent[]>) => {
+        state.data = action.payload;
+        state.status = "finished";
+      },
+      //for fireStore we have to format the date
+      prepare: (events: any) => {
+        //check if is an array, if not, means we are in EventDetailedPage and receiving an obj event so make it an array
+        let eventArray: AppEvent[] = [];
+        Array.isArray(events) ? eventArray = events : eventArray = [...eventArray, events];
+
+        const mapped = eventArray.map((e: any) => {
+          return   {...e, date: (e.date as Timestamp).toDate().toISOString() }
+        })
+        return { payload: mapped } 
+      }
     }
   }
 })
 
+export const actions = eventSlice.actions as GenericActions<AppEvent[]>;
 
 
-export const { createEvent, updateEvent, deleteEvent } = eventSlice.actions;
+
+/* ======================================================================================== */
+
+// export const eventSlice = createSlice({
+//   name: 'events',
+//   initialState,
+//   reducers: {
+//     setEvents: {
+//       reducer: (state, action: PayloadAction<AppEvent[]>) => {
+//         state.events = action.payload
+//       },
+//       //for fireStore we have to format the date
+//       prepare: (events: any) => {
+//         //check if is an array, if not, means we are in EventDetailedPage and receiving an obj event so make it an array
+//         let eventArray: AppEvent[] = [];
+//         Array.isArray(events) ? eventArray = events : eventArray = [...eventArray, events];
+
+//         const mapped = eventArray.map((e: any) => {
+//           return   {...e, date: (e.date as Timestamp).toDate().toISOString() }
+//         })
+//         return { payload: mapped } 
+//       }
+//     }
+//   }
+// })
+
+
+
+// export const { setEvents } = eventSlice.actions;
 
 export const eventReducer = eventSlice.reducer;

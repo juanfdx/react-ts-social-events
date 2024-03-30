@@ -1,9 +1,12 @@
-import { Button, Icon, Item, ItemGroup, List, Segment, SegmentGroup } from "semantic-ui-react";
-import EventListAttendee from "./EventListAttendee";
-import { AppEvent } from "../../../app/types/event";
 import { Link } from "react-router-dom";
-import { useAppDispatch } from "../../../app/store/store";
-import { deleteEvent } from "../eventSlice";
+import { Button, Icon, Item, ItemGroup, Label, List, Segment, SegmentGroup } from "semantic-ui-react";
+//redux
+import EventListAttendee from "./EventListAttendee";
+//type
+import { AppEvent } from "../../../app/types/event";
+//hook
+// import { useFireStore } from "../../../app/hooks/fireStore/useFireStore";
+
 
 type Props = {
   event: AppEvent;
@@ -12,7 +15,13 @@ type Props = {
 
 export default function EventListItem({event}: Props) {
 
-  const dispatch = useAppDispatch()
+  /* 
+  * NOTE:
+  * Maybe we don't want to show Delete button in client side of the app
+  * so we will hide button, and also commenting remove functionality
+   */
+  // const {remove} = useFireStore('events');
+
 
 
   return (
@@ -27,6 +36,14 @@ export default function EventListItem({event}: Props) {
               <Item.Description>
                 Hosted by {event.hostedBy}
               </Item.Description>
+              {event.isCancelled &&
+                <Label
+                  style={{top: '-40px'}}
+                  ribbon='right'
+                  color='red'
+                  content='This event has been cancelled'
+                />
+              }
             </Item.Content>
           </Item>
         </ItemGroup>
@@ -41,7 +58,7 @@ export default function EventListItem({event}: Props) {
 
       <Segment secondary >
         <List horizontal >
-          {event.attendees.map((attendee: any) => 
+          {event.attendees.map(attendee => 
           
             <EventListAttendee key={attendee.id} attendee={attendee} />
           
@@ -51,13 +68,13 @@ export default function EventListItem({event}: Props) {
 
       <Segment clearing>
         <span style={{display: 'block', marginBottom: '30px' }}>{event.description}</span>
-        <Button 
+        {/* <Button 
           floated='right' 
           color='red' 
           content='Delete' 
-          onClick={() => dispatch(deleteEvent(event.id))}
+          onClick={() => remove(event.id)}
         >
-        </Button>
+        </Button> */}
         <Button 
           as={Link}
           to={`/events/${event.id}`}
