@@ -4,6 +4,8 @@ import { testReducer } from "../../features/scratch/testSlice";
 import { eventReducer } from "../../features/events/eventSlice";
 import { modalReducer } from "../common/modals/modalSlice";
 import { authReducer } from "../../features/auth/authSlice";
+import { profileReducer } from '../../features/profile/ProfileSlice';
+import { photosReducer } from '../../features/profile/PhotosSlice';
 
 
 export const store = configureStore({
@@ -12,6 +14,8 @@ export const store = configureStore({
     events: eventReducer,
     modals: modalReducer,
     auth: authReducer,
+    profiles: profileReducer,
+    photos: photosReducer
   },
 })
 

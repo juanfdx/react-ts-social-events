@@ -2,14 +2,15 @@ import { useAppSelector } from "../../store/store"
 //component
 import TestModal from "../../../features/scratch/TestModal"
 import LoginForm from "../../../features/auth/LoginForm";
-
+import RegisterForm from "../../../features/auth/RegisterForm";
 
 
 export default function ModalManager() {
 
     const modalLoockup = {
         TestModal,
-        LoginForm
+        LoginForm,
+        RegisterForm
     }
 
     const {type, data, isOpen} = useAppSelector(state => state.modals)

@@ -4,15 +4,19 @@ import { FieldValues, useForm } from "react-hook-form";
 import { useAppDispatch } from "../../app/store/store";
 import { closeModal } from "../../app/common/modals/modalSlice";
 //firebase
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../app/config/firebase";
+import { Timestamp } from "firebase/firestore";
 //components
-import { Button, Divider, Form, FormInput, Label } from "semantic-ui-react";
-import SocialLogin from "./SocialLogin";
+import { Button, Form, FormInput, Label } from "semantic-ui-react";
+import { signIn } from "./authSlice";
+import { useFireStore } from "../../app/hooks/fireStore/useFireStore";
 
 
 
-export default function LoginForm() {
+export default function RegisterForm() {
+    //when use this hook, it will create profiles collection in firestore
+    const {set} = useFireStore('profiles');
 
     const {register, handleSubmit, setError, formState: {isSubmitting, isValid, isDirty, errors}} = useForm({
         mode: 'onTouched',
@@ -22,24 +26,42 @@ export default function LoginForm() {
 
     async function onSubmit(data: FieldValues) {
       try {
-        await signInWithEmailAndPassword(auth, data.email, data.password);
+        //we don't need the result, because in App.tx L22 firebase gets the user when logged in
+        const userCreds = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        await updateProfile(userCreds.user, {
+          displayName: data.displayName
+        });
+
+        await  set(userCreds.user.uid, {
+          displayName: data.displayName,
+          email: data.email,
+          createdAt: Timestamp.now()
+        });
+
+        dispatch(signIn(userCreds.user))
         dispatch(closeModal())
           
-        } catch (error: any) {
+        } catch (error: any ) {
           setError('root.serverError', {
             type:'400',
             message: error.message  
           })
-          console.error(error);  
+          console.error(error);
         }
     }
 
 
 
     return (
-      <ModalWrapper header='Sign into re-vents' size='mini'>
+      <ModalWrapper header='Register to re-vents'>
         <Form onSubmit={handleSubmit(onSubmit)}>
          
+          <FormInput 
+            {...register('displayName', { required: true })}
+            placeholder='Display name'
+            error={errors.displayName && 'Display name is required!'}  
+          />  
+
           <FormInput 
             {...register('email', { required: true, pattern: /.+@.+\..+/ })}
             placeholder='Email'
@@ -63,7 +85,7 @@ export default function LoginForm() {
               style={{display: 'block', marginBottom: '10px'}}
               content={errors.root.serverError?.message}  
             />
-          }  
+          }
 
           <Button
             type='submit'
@@ -72,13 +94,8 @@ export default function LoginForm() {
             fluid
             size="large"
             color="teal"
-            content='Login'
+            content='Register'
           />
-
-          <Divider horizontal> Or </Divider>
-
-          {/* Github and Google buttons */}
-          <SocialLogin />
 
         </Form>
       </ModalWrapper>

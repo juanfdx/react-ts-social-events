@@ -4,6 +4,8 @@ import EventDashboard from "../../features/events/dashboard/EventDashboard";
 import EventDetailedPage from "../../features/events/details/EventDetailedPage";
 import EventForm from "../../features/events/Form/EventForm";
 import Scratch from "../../features/scratch/Scratch";
+import AccountPage from "../../features/auth/AccountPage";
+import ProfilePage from "../../features/profile/ProfilePage";
 
 
 
@@ -25,8 +27,16 @@ export const router = createBrowserRouter([
         element: <EventForm />
       },
       {
+        path: '/profiles/:id',
+        element: <ProfilePage />
+      },
+      {
         path: '/createEvent',
         element: <EventForm key={'create'} />//with key, we can force rerendering of the component
+      },
+      {
+        path: '/account',
+        element: <AccountPage />
       },
       {
         path: '/scratch',
